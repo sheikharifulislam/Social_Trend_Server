@@ -2,7 +2,22 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv').config();
+const morgan = require('morgan');
 const server = express();
+
+//imports routes
+const authRoute = require('./routes/authRoutes');
+
+//middleware array
+const middleware = [
+    cors(),
+    morgan('dev'),
+    express.json(),
+    authRoute,
+];
+
+//use middleware
+server.use(middleware);
 
 server.get('/',async(req, res) => {
     try{
