@@ -3,16 +3,33 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv').config();
 const morgan = require('morgan');
+const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const server = express();
 
 //imports routes
 const authRoute = require('./routes/authRoutes');
+
+var store = new MongoDBStore({
+    uri: `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.jrudo.mongodb.net/Social_Trend?retryWrites=true&w=majority`,
+    collection: 'sessions',
+    expire: 5 * 24 * 60 * 60 * 1000,
+  });
 
 //middleware array
 const middleware = [
     cors(),
     morgan('dev'),
     express.json(),
+    session({
+        secret: process.env.SECRET_KEY || 'SECRET_KEY',
+        resave: false,
+        saveUninitialized: false,
+        store: store,
+        cookie: {
+            maxAge: (( 5 * 24) * 60 * 60 * 1000),
+        }
+    }),
     authRoute,
 ];
 

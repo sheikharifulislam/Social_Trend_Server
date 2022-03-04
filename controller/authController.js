@@ -30,6 +30,10 @@ exports.signUp = async(req, res) => {
 
 exports.signIn = async(req, res) => {
     try{
+        const errors = validationResult(req).formatWith(errorFormatter);
+        if(!errors.isEmpty()) {
+            return res.status(401).json(errors.mapped())
+        }
         const {email, password} = req.body;
         const user = await User.findOne({email});
         if(!user) {
@@ -43,10 +47,13 @@ exports.signIn = async(req, res) => {
             res.status(200).json(user);
         }
         else {
-            res.status(404).json({
+            res.status(401).json({
                 message: 'Email or Password Invaild',
             })
         }
+
+        req.session.isLoggedIn = true;
+        req.session.user = user;
     }
     catch(error) {
         console.log(error.message);
