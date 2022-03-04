@@ -1,5 +1,6 @@
 const User = require('../model/UserModel');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const {validationResult} = require('express-validator');
 const errorFormatter = require('../utlis/validationErrorFormatter');
 
@@ -8,25 +9,20 @@ exports.signUp = async(req, res) => {
         const errors = validationResult(req).formatWith(errorFormatter);
         if(!errors.isEmpty()) {
             return res.status(401).json(errors.mapped())
-        }
-       const {userName, email, password,birthday,gander} = req.body;
+        } 
+        const {password} = req.body;      
         const hashPassword = await bcrypt.hash(password, 15);
        const user = new User({
-        userName,
-        email,
-        password: hashPassword,
-        birthday,
-        gander,       
-       });
-       const result = await user.save();
+           ...req.body,
+           password: hashPassword,
+        });       
+       await user.save();
        res.status(201).json({
-           insertId: result._id,          
-       });
-      
+            insertId: user._id,
+        })
     }
     catch(error) {
-        res.status(501).json(error.message);
-        console.log(error);        
+        res.status(501).json(error.message);        
     }
 }
 
@@ -39,23 +35,24 @@ exports.signIn = async(req, res, next) => {
         const {email, password} = req.body;
         const user = await User.findOne({email});
         if(!user) {
-            return res.status(404).json({
+            return res.status(401).json({
                 message: 'Email or Password Invaild',
             })
         }
-
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if(isPasswordMatch) {
-            req.session.isLoggedIn = true;
-            req.session.user = user;
-            req.session.save((error) => {
-                if(error) {
-                    console.log(error);
-                    return next(error);
-                }
-                res.status(200).json(user);
-            })
-                 
+            //generate token
+           const token = jwt.sign({
+               userId: user._id,
+               userName: user.userName,
+           }, process.env.JWT_SECRET_KEY, {
+               expiresIn: '1h',
+           })
+           
+           res.status(200).json({
+               accessToken: `Bearer ${token}`,
+               message: 'Login Successful',
+           })
         }
         else {
             res.status(401).json({
