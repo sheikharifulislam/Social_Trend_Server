@@ -10,10 +10,12 @@ const server = express();
 //imports routes
 const authRoute = require('./routes/authRoutes');
 
-var store = new MongoDBStore({
-    uri: `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.jrudo.mongodb.net/Social_Trend?retryWrites=true&w=majority`,
-    collection: 'sessions',
-    expire: 5 * 24 * 60 * 60 * 1000,
+//import middleware
+const {bindUserWithRequest} = require('./middleware/authMiddleware');
+
+const store = new MongoDBStore({
+    uri: `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.jrudo.mongodb.net/Social_Trend?retryWrites=true&w=majority`,    
+    collection: 'sessions',    
   });
 
 //middleware array
@@ -25,11 +27,12 @@ const middleware = [
         secret: process.env.SECRET_KEY || 'SECRET_KEY',
         resave: false,
         saveUninitialized: false,
-        store: store,
         cookie: {
-            maxAge: (( 5 * 24) * 60 * 60 * 1000),
-        }
+            maxAge: 1000 * 60 * 60 * 24 * 7,
+        },
+        store,
     }),
+    // bindUserWithRequest,
     authRoute,
 ];
 
@@ -37,8 +40,9 @@ const middleware = [
 server.use(middleware);
 
 server.get('/',async(req, res) => {
-    try{
-        res.send("Well Come");
+    try{       
+        res.send("Well Come"); 
+        console.log(req.session);      
     }
     catch(error) {
         res.status(500).json({

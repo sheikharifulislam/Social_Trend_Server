@@ -20,15 +20,17 @@ exports.signUp = async(req, res) => {
        });
        const result = await user.save();
        res.status(201).json({
-           insertId: result._id,
+           insertId: result._id,          
        });
+      
     }
     catch(error) {
         res.status(501).json(error.message);
+        console.log(error);        
     }
 }
 
-exports.signIn = async(req, res) => {
+exports.signIn = async(req, res, next) => {
     try{
         const errors = validationResult(req).formatWith(errorFormatter);
         if(!errors.isEmpty()) {
@@ -44,25 +46,41 @@ exports.signIn = async(req, res) => {
 
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if(isPasswordMatch) {
-            res.status(200).json(user);
+            req.session.isLoggedIn = true;
+            req.session.user = user;
+            req.session.save((error) => {
+                if(error) {
+                    console.log(error);
+                    return next(error);
+                }
+                res.status(200).json(user);
+            })
+                 
         }
         else {
             res.status(401).json({
                 message: 'Email or Password Invaild',
             })
         }
-
-        req.session.isLoggedIn = true;
-        req.session.user = user;
     }
     catch(error) {
         console.log(error.message);
+        next(error);
     }
 }
 
-exports.logOut = async(req, res) => {
+exports.logOut = async(req, res, next) => {
     try{
-        console.log(req.body);
+        req.session.destroy((error) => {
+            if(error) {
+                console.log(error);
+                return next(error);
+            }
+            // return res.redirect('https://web.programming-hero.com/');
+            return res.status(200).json({
+                message: 'success',
+            })
+        });
     }
     catch(error) {
         console.log(error.message);

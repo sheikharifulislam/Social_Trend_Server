@@ -10,7 +10,7 @@ const {
 
 Router.post('/signup',signupValidator, signUp);
 Router.post('/signin',loginValidator, signIn);
-Router.post('/logout', logOut);
+Router.get('/logout', logOut);
 
 
 
