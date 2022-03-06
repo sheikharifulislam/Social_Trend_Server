@@ -1,17 +1,15 @@
 const jwt = require('jsonwebtoken');
-exports.checkLogin = (req,res,next) => {
-    const {authorization} = req.headers;
+const dotenv = require('dotenv').config();
+exports.checkLogin = (req,res,next) => {  
+    
     try{
-        console.log(authorization)
-        const token = authorization.split(' ')[1];
+        const cookies = req.signedCookies;        
+        const token = cookies[process.env.COOKIE_NAME].split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-        const {userId, userName} = decoded;
-        req.userId = userId;
-        req.userName = userName;
+        console.log(decoded);  
         next();
     }
     catch(err) {
-        console.log(err)
-        next("Authentication failure");
+        console.log(err.message);
     }
 }

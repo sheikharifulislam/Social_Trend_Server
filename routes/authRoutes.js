@@ -1,4 +1,4 @@
-const Router = require('express').Router();
+const AuthRouter = require('express').Router();
 const signupValidator = require('../validator/auth/signupValidator');
 const loginValidator = require('../validator/auth/loginValidator');
 
@@ -8,10 +8,10 @@ const {
     logOut,
 } = require('../controller/authController');
 
-Router.post('/signup',signupValidator, signUp);
-Router.post('/signin',loginValidator, signIn);
-Router.get('/logout', logOut);
+AuthRouter.post('/signup',signupValidator, signUp);
+AuthRouter.post('/signin',loginValidator, signIn);
+AuthRouter.get('/logout', logOut);
 
 
 
-module.exports = Router;
+module.exports = AuthRouter;

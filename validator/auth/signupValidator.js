@@ -11,23 +11,34 @@ module.exports = [
         .isEmail()
         .withMessage('Please Provide a Valid Email Address')
         .custom(async (email) => {
-            let user = await User.findOne({email});            
-            if(user) {
-                return Promise.reject('Email Alredy Used');
-               
+            try{
+                let user = await User.findOne({email});            
+                if(user) {
+                    return Promise.reject('Email Alredy Used');
+                
+                }
+            }
+            catch(err) {
+                throw new Error(err.message)
             }
         })    
         .normalizeEmail(),
         
     body('password')
+        .isStrongPassword()
         .isLength({min: 8})
         .withMessage('Your Password Must Be Grater Than 8 Chars'),
     body('confirmPassword')
         .isLength({min: 8})
         .withMessage('Confrim Password Must Be Grater Than 8 Chars')
         .custom(async(confirmPassword, {req}) => {
-            if(confirmPassword !== req.body.password) {
-                return Promise.reject('Password And Confirm Password Not Match')
-            }            
+            try{
+                if(confirmPassword !== req.body.password) {
+                    return Promise.reject('Password And Confirm Password Not Match')
+                } 
+            }  
+            catch(err) {
+                throw new Error(err.message)
+            }         
         })    
 ]

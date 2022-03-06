@@ -8,11 +8,13 @@ exports.signUp = async(req, res) => {
     try{       
         const errors = validationResult(req).formatWith(errorFormatter);
         if(!errors.isEmpty()) {
-            return res.status(401).json(errors.mapped())
+            return res.status(401).json({
+                errors: errors.mapped()
+            })
         } 
         const {password} = req.body;      
         const hashPassword = await bcrypt.hash(password, 15);
-       const user = new User({
+        const user = new User({
            ...req.body,
            password: hashPassword,
         });       
@@ -26,33 +28,52 @@ exports.signUp = async(req, res) => {
     }
 }
 
-exports.signIn = async(req, res, next) => {
+exports.signIn = async(req, res) => {
     try{
         const errors = validationResult(req).formatWith(errorFormatter);
         if(!errors.isEmpty()) {
-            return res.status(401).json(errors.mapped())
+            return res.status(401).json({
+                errors: errors.mapped(),
+            })
         }
         const {email, password} = req.body;
         const user = await User.findOne({email});
-        if(!user) {
-            return res.status(401).json({
-                message: 'Email or Password Invaild',
-            })
-        }
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
-        if(isPasswordMatch) {
-            //generate token
-           const token = jwt.sign({
-               userId: user._id,
-               userName: user.userName,
-           }, process.env.JWT_SECRET_KEY, {
-               expiresIn: '1h',
-           })
-           
-           res.status(200).json({
-               accessToken: `Bearer ${token}`,
-               message: 'Login Successful',
-           })
+        if(user && user._id) {
+            if(user.isVerified === false ) {
+                const isPasswordMatch = await bcrypt.compare(password, user.password);
+                if(isPasswordMatch) {
+
+                    //create new user object
+                    const userObject = {
+                        userId: user._id,
+                        userName: user.userName,
+                        email: user.email, 
+                    }
+
+                    //generate token
+                    const token = jwt.sign({
+                        userId: user._id,
+                        userName: user.userName,
+                        email: user.email,
+                    }, process.env.JWT_SECRET_KEY, {
+                        expiresIn: process.env.JWT_EXPIRY,
+                    })
+
+                    //set cookie
+                    res.cookie(process.env.COOKIE_NAME, `Bearer ${token}`, {
+                        maxAge: process.env.JWT_EXPIRY,
+                        httpOnly: true,
+                        signed: true,
+                    });               
+                
+                    res.status(200).json(userObject);
+                }
+                else {
+                    res.status(401).json({
+                        message: 'Email or Password Invaild',
+                    })
+                }
+            }
         }
         else {
             res.status(401).json({
@@ -61,23 +82,16 @@ exports.signIn = async(req, res, next) => {
         }
     }
     catch(error) {
-        console.log(error.message);
-        next(error);
+        console.log(error.message);        
     }
 }
 
-exports.logOut = async(req, res, next) => {
+exports.logOut = async(req, res) => {
     try{
-        req.session.destroy((error) => {
-            if(error) {
-                console.log(error);
-                return next(error);
-            }
-            // return res.redirect('https://web.programming-hero.com/');
-            return res.status(200).json({
-                message: 'success',
-            })
-        });
+        res.clearCookie(process.env.COOKIE_NAME);
+        res.status(200).json({
+            message: 'successfully log out',
+        })
     }
     catch(error) {
         console.log(error.message);
