@@ -28,7 +28,7 @@ exports.signUp = async(req, res) => {
         }, process.env.JWT_SECRET_KEY, {
             expiresIn: process.env.EMAIL_VERIFY_JWT_EXPIRY,
         })
-        res.cookie(process.env.SOCIAL_TREND_EMAIL_VERIFY, `Bearer ${token}`, {            
+        res.cookie(process.env.SOCIAL_TREND_EMAIL_VERIFY, `Bearer ${acountVerifytoken}`, {            
             httpOnly: true,
             signed: true,
         });       
