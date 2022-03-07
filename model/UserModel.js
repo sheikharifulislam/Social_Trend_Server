@@ -29,8 +29,14 @@ const userSchema = new Schema({
         required: true,
     },
     isVerified: {
-        type: Boolean,
-        default: false,
+        type: Boolean,        
+        enum: [true, false],
+        default: false,       
+    },
+    role: {
+        type: String,        
+        enum: ['user','admin'],
+        default: 'user',       
     },
     profile: {
         type: Schema.Types.ObjectId,

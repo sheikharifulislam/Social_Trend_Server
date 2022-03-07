@@ -4,6 +4,10 @@ const jwt = require('jsonwebtoken');
 const {validationResult} = require('express-validator');
 const errorFormatter = require('../utlis/validationErrorFormatter');
 
+
+const sendMail = require('../utlis/sendEmail');
+const acountVerifyTemplate = require('../utlis/acountVerifyTemplate');
+
 exports.signUp = async(req, res) => {
     try{       
         const errors = validationResult(req).formatWith(errorFormatter);
@@ -19,8 +23,19 @@ exports.signUp = async(req, res) => {
            password: hashPassword,
         });       
        await user.save();
+       const acountVerifytoken = jwt.sign({
+            userId: user._id,                       
+        }, process.env.JWT_SECRET_KEY, {
+            expiresIn: process.env.EMAIL_VERIFY_JWT_EXPIRY,
+        })
+        res.cookie(process.env.SOCIAL_TREND_EMAIL_VERIFY, `Bearer ${token}`, {            
+            httpOnly: true,
+            signed: true,
+        });       
+       const template = await acountVerifyTemplate(user,acountVerifytoken);       
+       sendMail(user.email,'Acount Verification',template);
        res.status(201).json({
-            insertId: user._id,
+            message: 'Please Check Your Email Address And Verify Your Email Address',
         })
     }
     catch(error) {
@@ -38,7 +53,7 @@ exports.signIn = async(req, res) => {
         }
         const {email, password} = req.body;
         const user = await User.findOne({email});
-        if(user && user._id) {
+        if(user._id) {
             if(user.isVerified === false ) {
                 const isPasswordMatch = await bcrypt.compare(password, user.password);
                 if(isPasswordMatch) {
