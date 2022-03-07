@@ -1,20 +1,25 @@
 const nodemailer = require("nodemailer");
 
-const sendEmail = async(email,subject,template) => {
+const sendEmail = async(userEmail,subject,template) => {
     try{        
         const transpoter = nodemailer.createTransport({
             host: process.env.HOST,
             service: process.env.MAIL_SERVICE,
             secure: false,
             auth: {
+                type: 'OAuth2',               
                 user: process.env.USER,
                 pass: process.env.PASS,
+                clientId: process.env.CLIENT_ID,
+                clientSecret: process.env.CLINET_SECRET,
+                refreshToken: process.env.REFRESH_TOKEN,
+                accessToken: process.env.ACCESS_TOKEN,
             }
         })
 
         await transpoter.sendMail({
             from:  process.env.USER,
-            to: email,
+            to: userEmail,
             subject,
             html: template,
         });
@@ -23,7 +28,7 @@ const sendEmail = async(email,subject,template) => {
     }
     catch(err) {
         console.log('email send failed');
-        console.log(err.template);
+        console.log(err.message);
     }
 }
 

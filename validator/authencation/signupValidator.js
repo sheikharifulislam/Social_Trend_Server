@@ -10,20 +10,17 @@ module.exports = [
     body('email')
         .isEmail()
         .withMessage('Please Provide a Valid Email Address')
-        .custom(async (email) => {
+        .custom(async (userEmail) => {
             try{
-                let user = await User.findOne({email});            
+                let user = await User.findOne({userEmail});                 
                 if(user) {
                     return Promise.reject('Email Alredy Used');
-                
                 }
             }
             catch(err) {
                 throw new Error(err.message)
             }
-        })    
-        .normalizeEmail(),
-        
+        }),
     body('password')
         .isStrongPassword()
         .isLength({min: 8})

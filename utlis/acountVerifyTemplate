@@ -1,5 +1,0 @@
-const acountVerifyTemplate = async(userData,token) => {    
-    return `<p>Hello ${userData.userName} Thanke Your For Create Acount. Please Click the Link For Acount Verifycation <a href=${process.env.HOST}/verify-acount/?userEmail=${userData.email}&&token=${token}&&userId=${userData._id}>Click</a></p>`
-}
-
-module.exports = acountVerifyTemplate;

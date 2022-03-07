@@ -22,20 +22,20 @@ exports.signUp = async(req, res) => {
            ...req.body,
            password: hashPassword,
         });       
-       await user.save();
+       await user.save();      
        const acountVerifytoken = jwt.sign({
             userId: user._id,                       
         }, process.env.JWT_SECRET_KEY, {
             expiresIn: process.env.EMAIL_VERIFY_JWT_EXPIRY,
         })
-        res.cookie(process.env.SOCIAL_TREND_EMAIL_VERIFY, `Bearer ${acountVerifytoken}`, {            
+        res.cookie(process.env.EMAIL_VERIFY_COOKIE_NAME, `Bearer ${acountVerifytoken}`, {            
             httpOnly: true,
             signed: true,
         });       
        const template = await acountVerifyTemplate(user,acountVerifytoken);       
        sendMail(user.email,'Acount Verification',template);
        res.status(201).json({
-            message: 'Please Check Your Email Address And Verify Your Email Address',
+            message: 'Please Check Your Email Inbox And Verify Your Email Address',
         })
     }
     catch(error) {
@@ -53,8 +53,8 @@ exports.signIn = async(req, res) => {
         }
         const {email, password} = req.body;
         const user = await User.findOne({email});
-        if(user._id) {
-            if(user.isVerified === false ) {
+        if(user) {
+            if(user.isVerified) {
                 const isPasswordMatch = await bcrypt.compare(password, user.password);
                 if(isPasswordMatch) {
 
@@ -88,6 +88,11 @@ exports.signIn = async(req, res) => {
                         message: 'Email or Password Invaild',
                     })
                 }
+            }
+            else {
+                res.status(401).json({
+                    message: 'Your Email Address is not verified Please verify your email address',
+                })
             }
         }
         else {
