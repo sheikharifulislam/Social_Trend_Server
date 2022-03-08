@@ -6,6 +6,7 @@ const sendEmail = async(userEmail,subject,template) => {
             host: process.env.HOST,
             service: process.env.MAIL_SERVICE,
             secure: false,
+            renew: true,
             auth: {
                 type: 'OAuth2',               
                 user: process.env.USER,
@@ -14,7 +15,8 @@ const sendEmail = async(userEmail,subject,template) => {
                 clientSecret: process.env.CLINET_SECRET,
                 refreshToken: process.env.REFRESH_TOKEN,
                 accessToken: process.env.ACCESS_TOKEN,
-            }
+            },
+            
         })
 
         await transpoter.sendMail({
@@ -28,7 +30,7 @@ const sendEmail = async(userEmail,subject,template) => {
     }
     catch(err) {
         console.log('email send failed');
-        console.log(err.message);
+        console.log(err);
     }
 }
 

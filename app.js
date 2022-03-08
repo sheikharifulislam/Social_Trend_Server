@@ -18,7 +18,7 @@ const { checkLogin } = require('./middleware/checkLogin');
 // middleware array
 const middleware = [
     cors(),
-    morgan('dev'),
+    // morgan('dev'),
     express.json(),
     cookieParser((process.env.COOKIE_NAME)),
 ];
