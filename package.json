@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
-    "config": "^3.3.7",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
