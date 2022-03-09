@@ -1,12 +1,13 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const dotenv = require('dotenv').config();
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+
 const server = express();
 
-//import modle
+// import modle
 const User = require('./model/UserModel');
 
 // imports routes
@@ -15,19 +16,19 @@ const authRoute = require('./routes/authRoutes');
 // import middleware
 const { checkLogin } = require('./middleware/checkLogin');
 
+// check enverment for use middleware
+if (process.env.NODE_ENV === 'development') {
+    server.use(morgan('dev'));
+}
+
 // middleware array
-const middleware = [
-    cors(),
-    // morgan('dev'),
-    express.json(),
-    cookieParser((process.env.COOKIE_NAME)),
-];
+const allMiddleware = [cors(), express.json(), cookieParser(process.env.COOKIE_NAME)];
 
-// use middleware
-server.use(middleware);
+// use all middleware
+server.use(allMiddleware);
 
-//Use Auth Middleware
-server.use('/auth',authRoute);
+// Use Auth Middleware
+server.use('/auth', authRoute);
 
 const errorHandler = (err, req, res, next) => {
     if (req.headerSent) {
@@ -50,7 +51,7 @@ server.get('/', async (req, res) => {
     }
 });
 
-server.get('/all-user', checkLogin, async (req, res) => {    
+server.get('/all-user', checkLogin, async (req, res) => {
     const alluser = await User.find();
     res.send(alluser);
 });
