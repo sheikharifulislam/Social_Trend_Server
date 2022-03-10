@@ -42,10 +42,14 @@ const userSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Profile',
         },
+        profilePic: {
+            type: String,
+            default: 'http://localhost:5000/uploads/defaultUserProfile.jpg',
+        },
     },
     {
         timestamps: true,
-    },
+    }
 );
 
 const User = model('User', userSchema);

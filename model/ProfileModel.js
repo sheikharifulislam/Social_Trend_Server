@@ -17,7 +17,11 @@ const profileSchema = new Schema(
             trim: true,
             maxLength: 350,
         },
-        profilePic: String,
+        profilePic: {
+            type: String,
+            default: 'http://localhost:5000/uploads/defaultUserProfile.jpg',
+        },
+        coverPic: String,
         links: {
             webSite: String,
             faceBook: String,

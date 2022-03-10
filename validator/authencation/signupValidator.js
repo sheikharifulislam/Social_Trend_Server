@@ -21,10 +21,16 @@ module.exports = [
             }
         }),
     body('password')
+        .not()
+        .isEmpty()
+        .withMessage('Please Provide Your  Password')
         .isStrongPassword()
         .isLength({ min: 8 })
         .withMessage('Your Password Must Be Grater Than 8 Chars'),
     body('confirmPassword')
+        .not()
+        .isEmpty()
+        .withMessage('Please Provide Your Confirm Password')
         .isLength({ min: 8 })
         .withMessage('Confrim Password Must Be Grater Than 8 Chars')
         .custom(async (confirmPassword, { req }) => {

@@ -1,6 +1,6 @@
 const jwtTokenValidator = require('../validator/authencation/jwtTokenValidator');
 
-exports.checkLogin = (req, res, next) => {
+module.exports = (req, res, next) => {
     const cookies = Object.keys(req.signedCookies).length > 0 ? req.signedCookies : null;
     if (cookies) {
         try {

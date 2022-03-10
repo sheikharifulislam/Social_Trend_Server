@@ -1,50 +1,39 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
 
-// create server
-const server = express();
+// create express app
+const app = express();
 
-// import modle
+// Import Modle
 const User = require('./model/UserModel');
 
-// imports routes
-const authRoute = require('./routes/authRoutes');
+// Import Middleware From Middleware Directory
+const setMiddleware = require('./middleware/middlewares');
+const checkLogin = require('./middleware/checkLogin');
 
-// import middleware
-const { checkLogin } = require('./middleware/checkLogin');
+// Import Routes From Routes Directory
+const setRoutes = require('./routes/routes');
 
-// check enverment for use middleware
-if (process.env.NODE_ENV === 'development') {
-    server.use(morgan('dev'));
-}
+// Using Middleware From Middleware Directory
+setMiddleware(app);
 
-// middleware array
-const allMiddleware = [cors(), express.json(), cookieParser(process.env.COOKIE_NAME)];
-
-// use all middleware
-server.use(allMiddleware);
-
-// Use Auth Middleware
-server.use('/auth', authRoute);
+// Using Routes From Routes Directory
+setRoutes(app);
 
 const errorHandler = (err, req, res, next) => {
-    if (req.headerSent) {
-        return next(err);
-    }
-    res.status(500).json({ error: err });
+    console.log(err.message);
+    res.status(500).json({
+        error: 'Internal Server Error',
+    });
 };
 
-// user error handeling middleware
-server.use(errorHandler);
+// Using Error Handler Middleware
+app.use(errorHandler);
 
-server.get('/', async (req, res) => {
+app.get('/', async (req, res) => {
     try {
         res.send('Well Come');
-        console.log(req.session);
     } catch (error) {
         res.status(500).json({
             message: error.message,
@@ -52,18 +41,18 @@ server.get('/', async (req, res) => {
     }
 });
 
-server.get('/all-user', checkLogin, async (req, res) => {
+app.get('/all-user', checkLogin, async (req, res) => {
     const alluser = await User.find();
     res.send(alluser);
 });
 
 const port = process.env.PORT || 5000;
-server.listen(port, async () => {
+app.listen(port, async () => {
     try {
         await mongoose.connect(
-            `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.jrudo.mongodb.net/Social_Trend?retryWrites=true&w=majority`,
+            `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.jrudo.mongodb.net/Social_Trend?retryWrites=true&w=majority`
         );
-        console.log(`server is running on ${port}`);
+        console.log(`Server is running on ${port}`);
     } catch (error) {
         console.log(error.message);
     }

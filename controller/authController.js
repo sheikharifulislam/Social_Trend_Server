@@ -7,7 +7,7 @@ const sendMail = require('../utlis/sendEmail');
 const acountVerifyTemplate = require('../utlis/acountVerifyTemplate');
 const jwtTokenValidator = require('../validator/authencation/jwtTokenValidator');
 
-exports.signUp = async (req, res) => {
+exports.signUp = async (req, res, next) => {
     try {
         const errors = validationResult(req).formatWith(errorFormatter);
         if (!errors.isEmpty()) {
@@ -29,7 +29,7 @@ exports.signUp = async (req, res) => {
             process.env.JWT_SECRET_KEY,
             {
                 expiresIn: process.env.EMAIL_VERIFY_JWT_EXPIRY,
-            },
+            }
         );
         const template = await acountVerifyTemplate(user, acountVerifytoken);
         sendMail(user.email, 'Acount Verification', template);
@@ -37,11 +37,11 @@ exports.signUp = async (req, res) => {
             message: 'Email verification link send. Please check you email inbox or spam folder',
         });
     } catch (error) {
-        res.status(501).json(error.message);
+        next(error);
     }
 };
 
-exports.signIn = async (req, res) => {
+exports.signIn = async (req, res, next) => {
     try {
         const errors = validationResult(req).formatWith(errorFormatter);
         if (!errors.isEmpty()) {
@@ -72,7 +72,7 @@ exports.signIn = async (req, res) => {
                         process.env.JWT_SECRET_KEY,
                         {
                             expiresIn: process.env.JWT_EXPIRY,
-                        },
+                        }
                     );
 
                     // set cookie
@@ -101,11 +101,11 @@ exports.signIn = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
-exports.verifyEmailAuthenticatiionLink = async (req, res) => {
+exports.verifyEmailAuthenticatiionLink = async (req, res, next) => {
     try {
         const { token } = req.query;
         if (token) {
@@ -136,7 +136,7 @@ exports.verifyEmailAuthenticatiionLink = async (req, res) => {
             });
         }
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
 
@@ -153,13 +153,13 @@ exports.currentUser = async (req, res) => {
     }
 };
 
-exports.logOut = async (req, res) => {
+exports.logOut = async (req, res, next) => {
     try {
         res.clearCookie(process.env.COOKIE_NAME);
         res.status(200).json({
             message: 'successfully log out',
         });
     } catch (error) {
-        console.log(error.message);
+        next(error);
     }
 };
