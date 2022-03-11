@@ -29,7 +29,7 @@ exports.signUp = async (req, res, next) => {
             process.env.JWT_SECRET_KEY,
             {
                 expiresIn: process.env.EMAIL_VERIFY_JWT_EXPIRY,
-            }
+            },
         );
         const template = await acountVerifyTemplate(user, acountVerifytoken);
         sendMail(user.email, 'Acount Verification', template);
@@ -60,19 +60,18 @@ exports.signIn = async (req, res, next) => {
                         userId: user._id,
                         userName: user.userName,
                         email: user.email,
+                        role: user.role,
+                        profilePic: user.profilePic,
                     };
-
                     // generate token
                     const token = jwt.sign(
                         {
-                            userId: user._id,
-                            userName: user.userName,
-                            email: user.email,
+                            ...userObject,
                         },
                         process.env.JWT_SECRET_KEY,
                         {
                             expiresIn: process.env.JWT_EXPIRY,
-                        }
+                        },
                     );
 
                     // set cookie
@@ -146,6 +145,8 @@ exports.currentUser = async (req, res) => {
         const token = cookies[process.env.COOKIE_NAME].split(' ')[1];
         const decoded = jwtTokenValidator(token);
         if (decoded) {
+            delete decoded.iat;
+            delete decoded.exp;
             res.status(200).json(decoded);
         }
     } else {

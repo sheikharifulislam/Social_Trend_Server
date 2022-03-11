@@ -9,12 +9,16 @@ cloudinary.config({
 });
 
 const hostFile = (req, res, next) => {
+    console.log(...req.body);
+    if (!req.file) {
+        return next();
+    }
     cloudinary.uploader.upload(req.file.path, { unique_filename: true }, async (error, result) => {
         try {
             if (error) {
-                console.log(error);
+                next(error);
             } else {
-                console.log(result);
+                req.file.url = result.secure_url;
                 await fs.unlink(req.file.path);
                 next();
             }

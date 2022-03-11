@@ -11,11 +11,13 @@ const profileSchema = new Schema(
             type: String,
             trim: true,
             maxLength: 150,
+            required: true,
         },
         bio: {
             type: String,
             trim: true,
             maxLength: 350,
+            required: true,
         },
         profilePic: {
             type: String,
@@ -43,7 +45,7 @@ const profileSchema = new Schema(
     },
     {
         timestamps: true,
-    }
+    },
 );
 
 const Profile = model('Profile', profileSchema);

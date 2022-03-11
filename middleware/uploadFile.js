@@ -1,13 +1,23 @@
 const multer = require('multer');
+const path = require('path');
 
+// Create Upload Folder
 const uploadFolder = 'uploads/';
 
+// Define The Storage
 const storage = multer.diskStorage({
-    destinatio: (req, file, cb) => {
+    destination: (req, file, cb) => {
         cb(null, uploadFolder);
     },
-    fileName: (req, file, cb) => {
-        cb(null, file.originalName);
+    filename: (req, file, cb) => {
+        const fileExt = path.extname(file.originalname);
+        const fileName = `${file.originalname
+            .replace(fileExt, '')
+            .toLowerCase()
+            .split(' ')
+            .join('-')}-${Date.now()}`;
+
+        cb(null, fileName + fileExt);
     },
 });
 
@@ -17,8 +27,8 @@ const uploadFile = multer({
         fileSize: 3000000,
     },
     fileFilter: (req, file, cb) => {
-        const allowedFileExt = /jpeg|png|jpeg|mp4/;
-        const mimeType = allowedFileExt.test(file.mimetype);
+        const allowedType = /jpeg|png|jpg/;
+        const mimeType = allowedType.test(file.mimetype);
         if (mimeType) {
             cb(null, true);
         } else {
