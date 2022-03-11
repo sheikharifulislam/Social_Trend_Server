@@ -12,7 +12,7 @@ module.exports = [
         .withMessage('Please Provide a Valid Email Address')
         .custom(async (userEmail) => {
             try {
-                const user = await User.findOne({ userEmail });
+                const user = await User.findOne({ email: userEmail });
                 if (user) {
                     return Promise.reject(new Error('Email Alredy Used'));
                 }

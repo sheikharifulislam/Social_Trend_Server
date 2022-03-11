@@ -24,7 +24,7 @@ const userSchema = new Schema(
             type: Date,
             required: true,
         },
-        gander: {
+        gender: {
             type: String,
             required: true,
         },
@@ -49,7 +49,7 @@ const userSchema = new Schema(
     },
     {
         timestamps: true,
-    }
+    },
 );
 
 const User = model('User', userSchema);
