@@ -8,24 +8,43 @@ cloudinary.config({
     secure: true,
 });
 
-const hostFile = (req, res, next) => {
-    console.log(...req.body);
-    if (!req.file) {
-        return next();
-    }
-    cloudinary.uploader.upload(req.file.path, { unique_filename: true }, async (error, result) => {
-        try {
-            if (error) {
-                next(error);
-            } else {
-                req.file.url = result.secure_url;
-                await fs.unlink(req.file.path);
-                next();
+const hostFile = async (req, res, next) => {
+    try {
+        const files = [];
+        if (req.files.length >= 1) {
+            for (const key of req.files) {
+                console.log('in');
+                cloudinary.uploader.upload(
+                    key.path,
+                    { unique_filename: true },
+                    async (error, result) => {
+                        try {
+                            if (error) {
+                                next(error);
+                            } else {
+                                const data = {
+                                    fieldName: key.fieldname,
+                                    imageInfo: {
+                                        publicId: result.public_id,
+                                        secureUrl: result.secure_url,
+                                    },
+                                };
+                                files.push(data);
+                                await fs.unlink(key.path);
+                            }
+                        } catch (err) {
+                            next(err);
+                        }
+                    }
+                );
             }
-        } catch (err) {
-            next(err);
         }
-    });
+        console.log('out');
+        req.files = files;
+        next();
+    } catch (err) {
+        next(err);
+    }
 };
 
 module.exports = hostFile;

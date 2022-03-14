@@ -6,7 +6,7 @@ const cors = require('cors');
 const allMiddleware = [cors(), express.json(), cookieParser(process.env.COOKIE_NAME)];
 
 module.exports = (app) => {
-    app.use('/uploads', express.static('uploads'));
+    app.use('/assets', express.static('assets'));
     if (process.env.NODE_ENV === 'development') {
         app.use(morgan('dev'));
     }

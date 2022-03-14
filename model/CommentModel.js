@@ -1,16 +1,16 @@
-const {  Schema, model  } = require('mongoose');
+const { Schema, model } = require('mongoose');
 // const User = require('./UserModel');
 // const Post = require('./PostModel');
 
 const commentSchema = new Schema(
     {
         post: {
-            type: Schema.Type.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'Post',
             required: true,
         },
         user: {
-            type: Schema.Type.ObjectId,
+            type: Schema.Types.ObjectId,
             ref: 'User',
             required: true,
         },
@@ -26,21 +26,21 @@ const commentSchema = new Schema(
                     required: true,
                 },
                 user: {
-                    type: Schema.Type.ObjectId,
+                    type: Schema.Types.ObjectId,
                     ref: 'User',
                     required: true,
                 },
                 createAt: {
                     type: Date,
                     default: new Date(),
-                },,
-            },,
-        ],,
+                },
+            },
+        ],
     },
     {
         timestamps: true,
-    }
-);;
+    },
+);
 
 const Comment = model('Comment', commentSchema);
 module.exports = Comment;

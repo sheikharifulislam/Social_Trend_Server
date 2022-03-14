@@ -43,13 +43,16 @@ const userSchema = new Schema(
             ref: 'Profile',
         },
         profilePic: {
-            type: String,
-            default: 'http://localhost:5000/uploads/defaultUserProfile.jpg',
+            fileId: String,
+            fileUrl: {
+                type: String,
+                default: 'assets/defaultUserProfile.jpg',
+            },
         },
     },
     {
         timestamps: true,
-    }
+    },
 );
 
 const User = model('User', userSchema);

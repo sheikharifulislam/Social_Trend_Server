@@ -7,7 +7,9 @@ module.exports = (req, res, next) => {
             const token = cookies[process.env.COOKIE_NAME].split(' ')[1];
             const decoded = jwtTokenValidator(token);
             if (decoded) {
-                res.user = decoded;
+                delete decoded.iat;
+                delete decoded.exp;
+                req.user = decoded;
                 next();
             } else {
                 res.status(401).json({

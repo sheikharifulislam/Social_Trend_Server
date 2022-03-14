@@ -1,5 +1,5 @@
 const { Schema, model } = require('mongoose');
-const Comment = require('./CommentModel');
+// const Comment = require('./CommentModel');
 
 const postSchema = new Schema(
     {
@@ -23,13 +23,13 @@ const postSchema = new Schema(
         comments: [
             {
                 type: Schema.Types.ObjectId,
-                ref: Comment,
+                ref: 'Comment',
             },
         ],
     },
     {
         timestamps: true,
-    },
+    }
 );
 
 const Post = model('Post', postSchema);

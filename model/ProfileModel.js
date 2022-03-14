@@ -7,23 +7,82 @@ const profileSchema = new Schema(
             ref: 'User',
             required: true,
         },
-        title: {
-            type: String,
-            trim: true,
-            maxLength: 150,
-            required: true,
-        },
         bio: {
             type: String,
             trim: true,
             maxLength: 350,
-            required: true,
+        },
+        workplace: {
+            company: {
+                type: String,
+                trim: true,
+            },
+            position: {
+                type: String,
+                trim: true,
+            },
+        },
+        education: {
+            highSchool: {
+                type: String,
+                trim: true,
+            },
+            university: {
+                type: String,
+                trim: true,
+            },
+        },
+        living: {
+            current: {
+                type: String,
+                trim: true,
+            },
+            permanent: {
+                type: String,
+                trim: true,
+            },
+        },
+        basicInfo: {
+            aboutYourSelf: {
+                type: String,
+                trim: true,
+            },
+            gender: {
+                type: String,
+                trim: true,
+            },
+            relationshipStatus: {
+                type: String,
+                trim: true,
+            },
+        },
+        contact: {
+            mobile: {
+                type: String,
+                trim: true,
+            },
+            email: {
+                type: String,
+                trim: true,
+            },
+            website: {
+                type: String,
+                trim: true,
+            },
         },
         profilePic: {
-            type: String,
-            default: 'http://localhost:5000/uploads/defaultUserProfile.jpg',
+            fileId: String,
+            fileUrl: {
+                type: String,
+                default: 'assets/defaultUserProfile.jpg',
+            },
         },
-        coverPic: String,
+        coverPic: {
+            fileId: String,
+            fileUrl: {
+                type: String,
+            },
+        },
         links: {
             webSite: String,
             faceBook: String,
@@ -42,10 +101,12 @@ const profileSchema = new Schema(
                 ref: 'Post',
             },
         ],
+        friedns: [],
+        friendsList: [],
     },
     {
         timestamps: true,
-    },
+    }
 );
 
 const Profile = model('Profile', profileSchema);

@@ -6,6 +6,7 @@ const errorFormatter = require('../utlis/validationErrorFormatter');
 const sendMail = require('../utlis/sendEmail');
 const acountVerifyTemplate = require('../utlis/acountVerifyTemplate');
 const jwtTokenValidator = require('../validator/authencation/jwtTokenValidator');
+const Profile = require('../model/CommentModel');
 
 exports.signUp = async (req, res, next) => {
     try {
@@ -22,6 +23,15 @@ exports.signUp = async (req, res, next) => {
             password: hashPassword,
         });
         await user.save();
+        await new Profile({
+            user: user._id,
+            title: '',
+            bio: '',
+            posts: [],
+            bookmarks: [],
+            friedns: [],
+            friednsList: [],
+        }).save();
         const acountVerifytoken = jwt.sign(
             {
                 userId: user._id,

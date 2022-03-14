@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 
 // Create Upload Folder
-const uploadFolder = 'uploads/';
+const uploadFolder = 'assets/';
 
 // Define The Storage
 const storage = multer.diskStorage({

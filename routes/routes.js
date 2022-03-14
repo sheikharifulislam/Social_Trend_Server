@@ -1,5 +1,5 @@
 const authRoute = require('./authRoutes');
-const userDashboardRoute = require('./userDashboardRoutes');
+const profileRoutes = require('./profileRoutes');
 
 const routes = [
     {
@@ -7,9 +7,13 @@ const routes = [
         handler: authRoute,
     },
     {
-        path: '/user-dashboard',
-        handler: userDashboardRoute,
+        path: '/profile',
+        handler: profileRoutes,
     },
+    // {
+    //     path: '/user',
+    //     handler: userRoute,
+    // },
 ];
 
 module.exports = (app) => {
